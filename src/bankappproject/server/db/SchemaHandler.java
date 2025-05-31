@@ -28,9 +28,24 @@ public abstract class SchemaHandler<T> {
         }
     }
 
-    public void create(T item) {
-        data.add(item);
-        save();
+    // Guardar o actualizar un objeto por su ID
+    public void save(T item) {
+        String id = getId(item);
+        boolean found = false;
+
+        for (int i = 0; i < data.size(); i++) {
+            if (getId(data.get(i)).equals(id)) {
+                data.set(i, item); // Update
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            data.add(item); // Insert
+        }
+
+        persist();
     }
 
     public List<T> findAll() {
@@ -48,7 +63,7 @@ public abstract class SchemaHandler<T> {
         for (int i = 0; i < data.size(); i++) {
             if (getId(data.get(i)).equals(id)) {
                 data.set(i, newItem);
-                save();
+                persist();
                 return;
             }
         }
@@ -58,10 +73,11 @@ public abstract class SchemaHandler<T> {
         data = data.stream()
                 .filter(item -> !getId(item).equals(id))
                 .collect(Collectors.toList());
-        save();
+        persist();
     }
 
-    protected void save() {
+    // Renombrado para evitar confusión con save(T item)
+    protected void persist() {
         try {
             transformer.write(data);
         } catch (IOException e) {
