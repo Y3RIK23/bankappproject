@@ -4,44 +4,73 @@
  */
 package bankappproject.server.AuthModule;
 
+import bankappproject.models.user.User;
+
 /**
  *
  * @author Gigabyte
  */
 public class AuthService {
 
-    public void login(LoginDTO loginData) throws IllegalArgumentException {
+    UserSchema userSchema = new UserSchema("./users.json");
 
-        // TODO: consultar si existe el usuario por cédula
-        // Mockeado a true, resultado de la funcion de buscar por cédula
-        boolean existUser = true;
+    public String login(LoginDTO loginData) throws IllegalArgumentException {
 
-        // Mockeado a false, comparador de contraseñas
-        boolean passwordMatch = false;
         
-        
-        // Mockeado a false, usar checkear si el usuario tiene la 
-        boolean isAlreadyActive = false;
+        User existUser = userSchema.findById(loginData.cedula);
 
-        if (!existUser) {
+        if (existUser == null) {
             throw new IllegalArgumentException(String.format("Usuario %s no existe", "nombredeusuario"));
         }
-        if (!passwordMatch) {
+
+        if (!existUser.getPassword().equals(loginData.contraseña)) {
             throw new IllegalArgumentException(String.format("Usuario %s no existe", "nombredeusuario"));
         }
-        
-        if(isAlreadyActive) {
+
+        if (existUser.isAlreadyActive()) {
             throw new IllegalArgumentException("Este usuario ya tiene una sesión activa");
-        }
-        
-        else {
+        } else {
+
+            existUser.setAlreadyActive(true);
             
-            // cambiar sesión de usuario a true
-            
-            // escribir el array en el JSON correspondiente
-            
+            userSchema.save(existUser);
         }
 
+        return String.format("Bienvenido %s", existUser.getName());
+
+    }
+
+    public String logout(String cedula) throws IllegalArgumentException {
+
+        User existUser = userSchema.findById(cedula);
+
+        if (existUser == null) {
+            throw new IllegalArgumentException(String.format("Usuario %s no existe", "nombredeusuario"));
+        }
+
+        if (!existUser.isAlreadyActive()) {
+            throw new IllegalArgumentException("Este usuario no tiene una sesión activa");
+        } else {
+
+            existUser.setAlreadyActive(false);
+            
+            userSchema.save(existUser);
+        }
+
+        return String.format("Cerrando sesión de %s", existUser.getName());
+
+    }
+
+    public String register(User user) throws IllegalArgumentException {
+
+        if (userSchema.findById(user.getId()) != null) {
+            throw new IllegalArgumentException(String.format("Usuario %s ya existe", user.getName()));
+        }
+
+        user.setAlreadyActive(false);
+        userSchema.save(user);
+
+        return String.format("Usuario %s registrado correctamente", user.getName());
     }
 
 }
