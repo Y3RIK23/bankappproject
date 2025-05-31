@@ -17,7 +17,7 @@ public class User {
 
     private String name;
     private String id;
-
+    private String password;
     //Referencia a cuentas bancarias en base de datos
     private ArrayList<BankAccount> cuentasBancarias;
 
@@ -28,6 +28,7 @@ public class User {
         this.id = builder.id;
         this.cuentasBancarias = builder.cuentasBancarias;
         this.alreadyActive = builder.alreadyActive;
+        this.password = builder.password;
     }
 
     public String getName() {
@@ -61,5 +62,12 @@ public class User {
     public void setAlreadyActive(boolean alreadyActive) {
         this.alreadyActive = alreadyActive;
     }
+    
+     public String getPassword() {
+        return password;
+    }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }

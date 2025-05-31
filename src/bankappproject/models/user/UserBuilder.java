@@ -18,6 +18,8 @@ public class UserBuilder {
     String id;
     ArrayList<BankAccount> cuentasBancarias = new ArrayList<>();
     boolean alreadyActive;
+    
+    String password;
 
     public UserBuilder setName(String name) {
         this.name = name;
@@ -36,6 +38,11 @@ public class UserBuilder {
 
     public UserBuilder setAlreadyActive(boolean alreadyActive) {
         this.alreadyActive = alreadyActive;
+        return this;
+    }
+    
+    public UserBuilder setPassword(String password) {
+        this.password = password;
         return this;
     }
 
