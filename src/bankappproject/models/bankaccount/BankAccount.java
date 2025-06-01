@@ -6,70 +6,77 @@ import java.util.UUID;
 
 public class BankAccount {
 
-    private String userCedula;
-    private String numeroCuenta;
-    private int saldoDisponible;
-    private ArrayList<String> transacciones;
+    private String userID;
+    private String accountNumber;
+    private int balance;
+    private ArrayList<String> transactions;
 
     // Constructor privado: solo accesible a través del Builder
     private BankAccount(Builder builder) {
-        this.userCedula = builder.userCedula;
-        this.numeroCuenta = builder.numeroCuenta != null ? builder.numeroCuenta : UUID.randomUUID().toString();
-        this.saldoDisponible = builder.saldoDisponible;
-        this.transacciones = builder.transacciones != null ? builder.transacciones : new ArrayList<>();
+        
+        this.userID = 
+                builder.userID;
+        this.accountNumber = 
+                builder.accountNumber != null ? builder.accountNumber : UUID.randomUUID().toString();
+        this.balance = 
+                builder.balance;
+        this.transactions = 
+                builder.transactions != null ? builder.transactions : new ArrayList<>();
+    
     }
 
     // Getters
-    public String getUserCedula() {
-        return userCedula;
+    public String getUserID() {
+        return userID;
     }
 
-    public String getNumeroCuenta() {
-        return numeroCuenta;
+    public String getAccountNumber() {
+        return accountNumber;
     }
 
-    public int getSaldoDisponible() {
-        return saldoDisponible;
+    public int getBalance() {
+        return balance;
     }
 
-    public ArrayList<String> getTransacciones() {
+    public ArrayList<String> getTransactions() {
         // TODO: Poblar desde la base de datos si es necesario
-        return transacciones;
+        return transactions;
     }
 
     // Métodos para modificar estado
     public void agregarTransaccion(Transaction transaction) {
-        transacciones.add(transaction.getId());
+        transactions.add(transaction.getId());
     }
 
-    public void actualizarSaldo(int nuevoSaldo) {
-        this.saldoDisponible = nuevoSaldo;
+    public void actualizarSaldo(int newBalance) {
+        this.balance = newBalance;
     }
 
     // Builder estático
     public static class Builder {
-        private String userCedula;
-        private String numeroCuenta; // opcional
-        private int saldoDisponible;
-        private ArrayList<String> transacciones;
+        
+        private String userID;
+        private String accountNumber; // opcional
+        private int balance;
+        private ArrayList<String> transactions;
 
-        public Builder setUserCedula(String userCedula) {
-            this.userCedula = userCedula;
+        public Builder setUserID(String userID) {
+            this.userID = userID;
             return this;
         }
 
-        public Builder setNumeroCuenta(String numeroCuenta) {
-            this.numeroCuenta = numeroCuenta;
+        public Builder setNumberAccount(String accountNumber) {
+            this.accountNumber = accountNumber;
             return this;
         }
 
-        public Builder setSaldoDisponible(int saldoDisponible) {
-            this.saldoDisponible = saldoDisponible;
+        public Builder setBalance(int balance) {
+            this.balance = balance;
             return this;
         }
 
-        public Builder setTransacciones(ArrayList<String> transacciones) {
-            this.transacciones = transacciones;
+        public Builder setTransactions(ArrayList<String> transactions) {
+            this.transactions = transactions;
             return this;
         }
 

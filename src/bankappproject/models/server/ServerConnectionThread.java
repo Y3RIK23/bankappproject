@@ -43,16 +43,16 @@ public class ServerConnectionThread extends Thread {
 
         ///////////// Usuario ficticio "quemado"///////////////////////
         BankAccount cuenta1 = new BankAccount.Builder()
-                .setUserCedula("12345678")
-                .setNumeroCuenta("1234567890")
-                .setSaldoDisponible(1500)
-                .setTransacciones(new ArrayList<>())
+                .setUserID("12345678")
+                .setNumberAccount("1234567890")
+                .setBalance(1500)
+                .setTransactions(new ArrayList<>())
                 .build();
 
         BankAccount cuenta2 = new BankAccount.Builder()
-                .setUserCedula("12345678")
-                .setNumeroCuenta("9876543210")
-                .setSaldoDisponible(3000)
+                .setUserID("12345678")
+                .setNumberAccount("9876543210")
+                .setBalance(3000)
                 .build();
 
         ArrayList<BankAccount> cuentas = new ArrayList<>();
@@ -80,9 +80,9 @@ public class ServerConnectionThread extends Thread {
             switch (opcion) {
                 case "1": //Ver cuentas
                     String cuentasInfo = "Tus cuentas:\n";
-                    for (BankAccount cuenta : user.getCuentasBancarias()) {
-                        cuentasInfo += "Cuenta: " + cuenta.getNumeroCuenta()
-                                + ", Saldo: " + cuenta.getSaldoDisponible() + "\n";
+                    for (BankAccount cuenta : user.getBankAccounts()) {
+                        cuentasInfo += "Cuenta: " + cuenta.getAccountNumber()
+                                + ", Saldo: " + cuenta.getBalance() + "\n";
                     }
                     output.writeUTF(cuentasInfo.toString());
                     break;
@@ -91,12 +91,12 @@ public class ServerConnectionThread extends Thread {
                     output.writeUTF("Ingrese monto a depositar:");
                     try {
                         int montoDeposito = Integer.parseInt(input.readUTF());
-                        BankAccount cuenta = user.getCuentasBancarias().get(0);
-                        cuenta.actualizarSaldo(cuenta.getSaldoDisponible() + montoDeposito);
+                        BankAccount cuenta = user.getBankAccounts().get(0);
+                        cuenta.actualizarSaldo(cuenta.getBalance() + montoDeposito);
 
                         //Crear transacción
                         Transaction deposito = new Transaction.Builder()
-                                .setCuenta(cuenta.getNumeroCuenta())
+                                .setCuenta(cuenta.getAccountNumber())
                                 .setFecha(new Date())
                                 .setTransaccionType(Transaction.TransaccionType.DEPOSITO)
                                 .setCredito(montoDeposito)
@@ -104,7 +104,7 @@ public class ServerConnectionThread extends Thread {
                                 .build();
 
                         cuenta.agregarTransaccion(deposito);
-                        output.writeUTF("Deposito realizado. Nuevo saldo: " + cuenta.getSaldoDisponible());
+                        output.writeUTF("Deposito realizado. Nuevo saldo: " + cuenta.getBalance());
                     } catch (IOException e) {
                         output.writeUTF("Error: Ingrese un número válido.");
                     }
@@ -114,20 +114,20 @@ public class ServerConnectionThread extends Thread {
                     output.writeUTF("Ingrese monto a retirar:");
                     try {
                         int montoRetiro = Integer.parseInt(input.readUTF());
-                        BankAccount cuenta = user.getCuentasBancarias().get(0);
-                        if (montoRetiro > cuenta.getSaldoDisponible()) {
+                        BankAccount cuenta = user.getBankAccounts().get(0);
+                        if (montoRetiro > cuenta.getBalance()) {
                             output.writeUTF("Saldo insuficiente.");
                         } else {
-                            cuenta.actualizarSaldo(cuenta.getSaldoDisponible() - montoRetiro);
+                            cuenta.actualizarSaldo(cuenta.getBalance() - montoRetiro);
                             Transaction retiro = new Transaction.Builder()
-                                    .setCuenta(cuenta.getNumeroCuenta())
+                                    .setCuenta(cuenta.getAccountNumber())
                                     .setFecha(new Date())
                                     .setTransaccionType(Transaction.TransaccionType.RETIRO)
                                     .setCredito(0)
                                     .setDebito(montoRetiro)
                                     .build();
                             cuenta.agregarTransaccion(retiro);
-                            output.writeUTF("Retiro realizado. Saldo restante: " + cuenta.getSaldoDisponible());
+                            output.writeUTF("Retiro realizado. Saldo restante: " + cuenta.getBalance());
                         }
                     } catch (IOException e) {
                         output.writeUTF("Error: Ingrese un numero válido.");

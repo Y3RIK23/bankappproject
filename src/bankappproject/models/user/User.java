@@ -19,14 +19,14 @@ public class User {
     private String id;
     private String password;
     //Referencia a cuentas bancarias en base de datos
-    private ArrayList<BankAccount> cuentasBancarias;
+    private ArrayList<BankAccount> bankAccounts;
 
     private boolean alreadyActive;
 
     User(UserBuilder builder) {
         this.name = builder.name;
         this.id = builder.id;
-        this.cuentasBancarias = builder.cuentasBancarias;
+        this.bankAccounts = builder.cuentasBancarias;
         this.alreadyActive = builder.alreadyActive;
         this.password = builder.password;
     }
@@ -47,12 +47,12 @@ public class User {
         this.id = id;
     }
 
-    public ArrayList<BankAccount> getCuentasBancarias() {
-        return cuentasBancarias;
+    public ArrayList<BankAccount> getBankAccounts() {
+        return bankAccounts;
     }
 
-    public void setCuentasBancarias(ArrayList<BankAccount> cuentasBancarias) {
-        this.cuentasBancarias = cuentasBancarias;
+    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
 
     public boolean isAlreadyActive() {
@@ -70,4 +70,10 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    @Override
+    public String toString() {
+        return "User{" + "name=" + name + ", id=" + id + ", password=" + password + ", bankAccounts=" + bankAccounts + ", alreadyActive=" + alreadyActive + '}';
+    }        
+    
 }
