@@ -36,7 +36,7 @@ public class AuthService {
             userSchema.save(existUser);
         }
 
-        return String.format("Bienvenido %s", existUser.getName());
+        return String.format("Bienvenido %s", existUser.getId());
 
     }
 
@@ -57,20 +57,20 @@ public class AuthService {
             userSchema.save(existUser);
         }
 
-        return String.format("Cerrando sesión de %s", existUser.getName());
+        return String.format("Cerrando sesión de %s", existUser.getId());
 
     }
 
     public String register(User user) throws IllegalArgumentException {
 
         if (userSchema.findById(user.getId()) != null) {
-            throw new IllegalArgumentException(String.format("Usuario %s ya existe", user.getName()));
+            throw new IllegalArgumentException(String.format("Usuario %s ya existe", user.getId()));
         }
 
         user.setAlreadyActive(false);
         userSchema.save(user);
 
-        return String.format("Usuario %s registrado correctamente", user.getName());
+        return String.format("Usuario %s registrado correctamente", user.getId());
     }
 
 }

@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public abstract class SchemaHandler<T> {
+public abstract class SchemaHandler <T> {
 
     protected final Class<T> clazz;
     protected final JsonTransformer transformer;

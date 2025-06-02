@@ -4,8 +4,7 @@
  */
 package bankappproject.models.user;
 
-import bankappproject.models.bankaccount.BankAccount;
-import bankappproject.models.user.UserBuilder;
+import bankappproject.models.bankAccount.BankAccount;
 
 import java.util.ArrayList;
 
@@ -15,7 +14,9 @@ import java.util.ArrayList;
  */
 public class User {
 
-    private String name;
+    //Referencia a cuentas bancarias en base de datos
+    private ArrayList<BankAccount> bankAccounts;
+    
     private String id;
     private String password;
     //Referencia a cuentas bancarias en base de datos
@@ -31,12 +32,8 @@ public class User {
         this.password = builder.password;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public ArrayList<BankAccount> getBankAccounts() {
+        return bankAccounts;
     }
 
     public String getId() {
@@ -59,12 +56,12 @@ public class User {
         return alreadyActive;
     }
 
-    public void setAlreadyActive(boolean alreadyActive) {
-        this.alreadyActive = alreadyActive;
+    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
-    
-     public String getPassword() {
-        return password;
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setPassword(String password) {
