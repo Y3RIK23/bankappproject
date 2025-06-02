@@ -1,8 +1,6 @@
-package bankappproject.models.bankaccount;
+package bankappproject.models.bankAccount;
 
-import bankappproject.models.transactions.Transaction;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class BankAccount {
 
@@ -51,6 +49,14 @@ public class BankAccount {
     public void actualizarSaldo(int newBalance) {
         this.balance = newBalance;
     }
+    
+    // Se puede modificar para que funcione con el estado de cuenta //
+    @Override
+    public String toString() {
+        return "BankAccount{" + 
+                "numeroCuenta=" + numeroCuenta + 
+                ", saldoDisponible=" + saldoDisponible + '}';
+    }   
 
     // Builder estático
     public static class Builder {

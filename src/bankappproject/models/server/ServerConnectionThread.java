@@ -4,10 +4,10 @@
  */
 package bankappproject.models.server;
 
-import bankappproject.models.bankaccount.BankAccount;
-import bankappproject.models.transactions.Transaction;
+import bankappproject.models.bankAccount.BankAccount;
+import bankappproject.models.bankAccount.Transaction;
 import bankappproject.models.user.User;
-import bankappproject.models.user.UserBuilder;
+import bankappproject.models.user.UserConcreteBuilder;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
