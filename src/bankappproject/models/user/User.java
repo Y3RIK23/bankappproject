@@ -4,8 +4,7 @@
  */
 package bankappproject.models.user;
 
-import bankappproject.models.bankaccount.BankAccount;
-import bankappproject.models.user.UserBuilder;
+import bankappproject.models.bankAccount.BankAccount;
 
 import java.util.ArrayList;
 
@@ -15,59 +14,57 @@ import java.util.ArrayList;
  */
 public class User {
 
-    private String name;
+    //Referencia a cuentas bancarias en base de datos
+    private ArrayList<BankAccount> bankAccounts;
+    
     private String id;
     private String password;
-    //Referencia a cuentas bancarias en base de datos
-    private ArrayList<BankAccount> cuentasBancarias;
+    
+    private boolean alreadyActive; //Cambia su estado con cada inicio o cierre de sesion
 
-    private boolean alreadyActive;
-
-    User(UserBuilder builder) {
-        this.name = builder.name;
-        this.id = builder.id;
-        this.cuentasBancarias = builder.cuentasBancarias;
-        this.alreadyActive = builder.alreadyActive;
-        this.password = builder.password;
+    public User() {                
+        
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+    public ArrayList<BankAccount> getBankAccounts() {
+        return bankAccounts;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public ArrayList<BankAccount> getCuentasBancarias() {
-        return cuentasBancarias;
-    }
-
-    public void setCuentasBancarias(ArrayList<BankAccount> cuentasBancarias) {
-        this.cuentasBancarias = cuentasBancarias;
+    public String getPassword() {
+        return password;
     }
 
     public boolean isAlreadyActive() {
         return alreadyActive;
     }
 
-    public void setAlreadyActive(boolean alreadyActive) {
-        this.alreadyActive = alreadyActive;
+    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
     }
-    
-     public String getPassword() {
-        return password;
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public void setAlreadyActive(boolean alreadyActive) {
+        this.alreadyActive = alreadyActive;
+    }       
+    
+    @Override
+    public String toString() {
+        return "User{" + 
+                "bankAccounts=" + bankAccounts + 
+                ", id=" + id + 
+                ", password=" + password + 
+                ", alreadyActive=" + alreadyActive + '}';
+    }    
+    
 }
