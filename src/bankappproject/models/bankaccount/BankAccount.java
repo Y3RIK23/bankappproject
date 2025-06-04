@@ -1,13 +1,14 @@
 package bankappproject.models.bankAccount;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class BankAccount {
 
     private String userID;
     private String accountNumber;
     private int balance;
-    private ArrayList<String> transactions;
+    private ArrayList<Transaction> transactions;
 
     // Constructor privado: solo accesible a través del Builder
     private BankAccount(Builder builder) {
@@ -36,14 +37,14 @@ public class BankAccount {
         return balance;
     }
 
-    public ArrayList<String> getTransactions() {
+    public ArrayList<Transaction> getTransactions() {
         // TODO: Poblar desde la base de datos si es necesario
         return transactions;
     }
 
     // Métodos para modificar estado
     public void agregarTransaccion(Transaction transaction) {
-        transactions.add(transaction.getId());
+        transactions.add(transaction);
     }
 
     public void actualizarSaldo(int newBalance) {
@@ -54,8 +55,8 @@ public class BankAccount {
     @Override
     public String toString() {
         return "BankAccount{" + 
-                "numeroCuenta=" + numeroCuenta + 
-                ", saldoDisponible=" + saldoDisponible + '}';
+                "numeroCuenta=" + accountNumber + 
+                ", saldoDisponible=" + balance + '}';
     }   
 
     // Builder estático
@@ -64,7 +65,7 @@ public class BankAccount {
         private String userID;
         private String accountNumber; // opcional
         private int balance;
-        private ArrayList<String> transactions;
+        private ArrayList<Transaction> transactions;
 
         public Builder setUserID(String userID) {
             this.userID = userID;
@@ -81,7 +82,7 @@ public class BankAccount {
             return this;
         }
 
-        public Builder setTransactions(ArrayList<String> transactions) {
+        public Builder setTransactions(ArrayList<Transaction> transactions) {
             this.transactions = transactions;
             return this;
         }
