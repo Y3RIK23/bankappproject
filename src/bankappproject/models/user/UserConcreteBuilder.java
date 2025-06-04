@@ -40,7 +40,7 @@ public class UserConcreteBuilder implements UserAbstractBuilder{
     @Override
     public void buildPassword(String password) throws UserException{
 
-        if (!(password.length() >= 4 && password.length() >= 10))
+        if (!(password.length() <= 4 && password.length() >= 10))
             throw new UserException(
                     "La contraseña debe contar con almenos: "
                             + "\n.4 caracteres y maximo 10");
@@ -62,6 +62,11 @@ public class UserConcreteBuilder implements UserAbstractBuilder{
         // FALTA AGREGAR USER A LA LISTA DE USUARIOS //
         return user;
         
+    }
+
+    @Override
+    public void buildActiveState() throws UserException {
+        user.setAlreadyActive(false);
     }
     
 }

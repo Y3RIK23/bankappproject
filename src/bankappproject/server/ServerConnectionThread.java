@@ -59,12 +59,10 @@ public class ServerConnectionThread extends Thread {
         cuentas.add(cuenta1);
         cuentas.add(cuenta2);
 
-        User user = new UserBuilder()
-                .setName("Juan Perez")
-                .setId("12345678")
-                .setCuentasBancarias(cuentas)
-                .setAlreadyActive(true)
-                .build();
+       
+        // User Builder
+        
+        
         ///////////// Usuario ficticio "quemado"///////////////////////
 
 

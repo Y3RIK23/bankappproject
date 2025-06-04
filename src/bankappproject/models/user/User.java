@@ -12,24 +12,15 @@ import java.util.ArrayList;
  *
  * @author Gigabyte
  */
-public class User {
-
-    //Referencia a cuentas bancarias en base de datos
-    private ArrayList<BankAccount> bankAccounts;
-    
+public class User {    
     private String id;
     private String password;
-    //Referencia a cuentas bancarias en base de datos
     private ArrayList<BankAccount> bankAccounts;
 
     private boolean alreadyActive;
 
-    User(UserBuilder builder) {
-        this.name = builder.name;
-        this.id = builder.id;
-        this.bankAccounts = builder.cuentasBancarias;
-        this.alreadyActive = builder.alreadyActive;
-        this.password = builder.password;
+    User() {
+        
     }
 
     public ArrayList<BankAccount> getBankAccounts() {
@@ -44,9 +35,7 @@ public class User {
         this.id = id;
     }
 
-    public ArrayList<BankAccount> getBankAccounts() {
-        return bankAccounts;
-    }
+   
 
     public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
         this.bankAccounts = bankAccounts;
@@ -56,12 +45,12 @@ public class User {
         return alreadyActive;
     }
 
-    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
-        this.bankAccounts = bankAccounts;
+    public String getPassword() {
+        return password;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setAlreadyActive(boolean alreadyActive) {
+        this.alreadyActive = alreadyActive;
     }
 
     public void setPassword(String password) {
@@ -70,7 +59,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{" + "name=" + name + ", id=" + id + ", password=" + password + ", bankAccounts=" + bankAccounts + ", alreadyActive=" + alreadyActive + '}';
+        return "User{id=" + id + ", password=" + password + ", bankAccounts=" + bankAccounts + ", alreadyActive=" + alreadyActive + '}';
     }        
     
 }
