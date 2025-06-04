@@ -36,7 +36,6 @@ public class User {
     }
 
    
-
     public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
         this.bankAccounts = bankAccounts;
     }
