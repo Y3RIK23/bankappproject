@@ -105,9 +105,8 @@ public class TransactionsService {
 
         Transaction transaccion = new Transaction(new Date(), Transaction.TransaccionType.INVERSION, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
-        
-        data.guardarUsuario(user);
 
+        data.guardarUsuario(user);
 
         return String.format("Certificado de Inversion exitoso. Nuevo saldo: %.2f en la cuenta %s", dto.amount, cuenta.getNumeroCuenta());
 
@@ -121,5 +120,20 @@ public class TransactionsService {
             }
         }
         return null;
+    }
+
+    public String accountStatus(String userId, String accountNumber) {
+        User user = Data.getInstance().buscarUsuarioPorId(userId);
+        if (user == null) {
+            throw new IllegalArgumentException("Usuario no encontrado.");
+        }
+
+        for (BankAccount cuenta : user.getBankAccounts()) {
+            if (cuenta.getNumeroCuenta().equals(accountNumber)) {
+                return cuenta.estadoCuenta();
+            }
+        }
+
+        throw new IllegalArgumentException("No se encontró la cuenta bancaria.");
     }
 }

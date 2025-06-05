@@ -4,27 +4,24 @@
  */
 package bankappproject.server;
 
-import bankappproject.models.bankAccount.BankAccount;
-import bankappproject.models.bankAccount.Transaction;
-import bankappproject.models.user.User;
-import bankappproject.models.user.UserConcreteBuilder;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import bankappproject.models.user.*;
+import bankappproject.models.bankAccount.*;
+import bankappproject.server.AuthModule.*;
+import bankappproject.server.TransactionsService.*;
+import bankappproject.server.db.Data;
+
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Date;
 
-/**
- *
- * @author Usuario
- */
 public class ServerConnectionThread extends Thread {
 
     private DataOutputStream output;
     private DataInputStream input;
     private Socket connection;
 
+    private final AuthService authService = new AuthService();
+    private final TransactionsService transactionsService = new TransactionsService();
 
     public ServerConnectionThread(Socket connection) {
         this.connection = connection;
@@ -32,113 +29,150 @@ public class ServerConnectionThread extends Thread {
 
     private void getStreams() throws IOException {
         output = new DataOutputStream(connection.getOutputStream());
-        output.flush();
         input = new DataInputStream(connection.getInputStream());
     }
 
     private void processClient() throws IOException {
-        // Leer ID usuario (se deberia utilizar para autenticar pero falta esa picha(clase))
-        output.writeUTF("Ingrese su ID de usuario:");
-        String userId = input.readUTF();
+        User user = null;
+        boolean authenticated = false;
 
-        ///////////// Usuario ficticio "quemado"///////////////////////
-        BankAccount cuenta1 = new BankAccount.Builder()
-                .setUserID("12345678")
-                .setNumberAccount("1234567890")
-                .setBalance(1500)
-                .setTransactions(new ArrayList<>())
-                .build();
+        while (!authenticated) {
+            output.writeUTF("Seleccione una opción:\n1 - Iniciar sesión\n2 - Registrar\n3 - Salir");
+            String option = input.readUTF();
 
-        BankAccount cuenta2 = new BankAccount.Builder()
-                .setUserID("12345678")
-                .setNumberAccount("9876543210")
-                .setBalance(3000)
-                .build();
+            switch (option) {
+                case "1":
+                    output.writeUTF("Ingrese cédula:");
+                    String cedula = input.readUTF();
+                    output.writeUTF("Ingrese contraseña:");
+                    String pass = input.readUTF();
 
-        ArrayList<BankAccount> cuentas = new ArrayList<>();
-        cuentas.add(cuenta1);
-        cuentas.add(cuenta2);
-
-       
-        // User Builder
-        
-        
-        ///////////// Usuario ficticio "quemado"///////////////////////
-
-
-        
-        output.writeUTF("Bienvenido " + user.getName());
-        boolean running = true;
-
-        // Ejemplo simple de operaciones
-        while (running) {
-            output.writeUTF("Opciones:\n1-Ver cuentas\n2-Hacer deposito\n3-Hacer retiro\n4-Salir");
-            String opcion = input.readUTF();
-
-            switch (opcion) {
-                case "1": //Ver cuentas
-                    String cuentasInfo = "Tus cuentas:\n";
-                    for (BankAccount cuenta : user.getBankAccounts()) {
-                        cuentasInfo += "Cuenta: " + cuenta.getAccountNumber()
-                                + ", Saldo: " + cuenta.getBalance() + "\n";
-                    }
-                    output.writeUTF(cuentasInfo.toString());
-                    break;
-
-                case "2": //Deposito simple
-                    output.writeUTF("Ingrese monto a depositar:");
                     try {
-                        int montoDeposito = Integer.parseInt(input.readUTF());
-                        BankAccount cuenta = user.getBankAccounts().get(0);
-                        cuenta.actualizarSaldo(cuenta.getBalance() + montoDeposito);
-
-                        //Crear transacción
-                        Transaction deposito = new Transaction.Builder()
-                                .setCuenta(cuenta.getAccountNumber())
-                                .setFecha(new Date())
-                                .setTransaccionType(Transaction.TransaccionType.DEPOSITO)
-                                .setCredito(montoDeposito)
-                                .setDebito(0)
-                                .build();
-
-                        cuenta.agregarTransaccion(deposito);
-                        output.writeUTF("Deposito realizado. Nuevo saldo: " + cuenta.getBalance());
-                    } catch (IOException e) {
-                        output.writeUTF("Error: Ingrese un número válido.");
+                        LoginDTO dto = new LoginDTO();
+                        dto.cedula = cedula;
+                        dto.contraseña = pass;
+                        output.writeUTF(authService.login(dto));
+                        user = Data.getInstance().buscarUsuarioPorId(cedula);
+                        authenticated = true;
+                    } catch (IllegalArgumentException e) {
+                        output.writeUTF("Error: " + e.getMessage());
                     }
                     break;
 
-                case "3": //Retiro simple
-                    output.writeUTF("Ingrese monto a retirar:");
+                case "2":
+                    output.writeUTF("Ingrese cédula:");
+                    String newID = input.readUTF();
+                    output.writeUTF("Ingrese contraseña:");
+                    String newPass = input.readUTF();
+
                     try {
-                        int montoRetiro = Integer.parseInt(input.readUTF());
-                        BankAccount cuenta = user.getBankAccounts().get(0);
-                        if (montoRetiro > cuenta.getBalance()) {
-                            output.writeUTF("Saldo insuficiente.");
-                        } else {
-                            cuenta.actualizarSaldo(cuenta.getBalance() - montoRetiro);
-                            Transaction retiro = new Transaction.Builder()
-                                    .setCuenta(cuenta.getAccountNumber())
-                                    .setFecha(new Date())
-                                    .setTransaccionType(Transaction.TransaccionType.RETIRO)
-                                    .setCredito(0)
-                                    .setDebito(montoRetiro)
-                                    .build();
-                            cuenta.agregarTransaccion(retiro);
-                            output.writeUTF("Retiro realizado. Saldo restante: " + cuenta.getBalance());
-                        }
-                    } catch (IOException e) {
-                        output.writeUTF("Error: Ingrese un numero válido.");
+                        UserConcreteBuilder builder = new UserConcreteBuilder();
+                        UserDirector director = new UserDirector();
+                        User nuevo = director.construirAlerta(builder, newID, newPass);
+                        nuevo.setAlreadyActive(false);
+                        authService.register(nuevo);
+                        output.writeUTF("Registro exitoso. Ahora puede iniciar sesión.");
+                    } catch (UserException | IllegalArgumentException e) {
+                        output.writeUTF("Error: " + e.getMessage());
                     }
                     break;
 
-                case "4": //Salir
-                    output.writeUTF("Gracias por usar el servicio. Adios!");
-                    running = false;
-                    break;
+                case "3":
+                    output.writeUTF("Saliendo...");
+                    return;
 
                 default:
-                    output.writeUTF("Opcion invalida. Intente de nuevo.");
+                    output.writeUTF("Opción inválida.");
+            }
+        }
+
+        boolean running = true;
+
+        while (running) {
+            output.writeUTF("Menú:\n1 - Ver cuentas\n2 - Crear cuenta\n3 - Depositar\n4 - Retirar\n5 - Inversión\n6 - Estado de cuenta\n7 - Cerrar sesión");
+            String opcion = input.readUTF();
+
+            try {
+                switch (opcion) {
+                    case "1":
+                        StringBuilder banckAccounts = new StringBuilder("Cuentas:\n");
+                        for (BankAccount cuenta : user.getBankAccounts()) {
+                            banckAccounts.append("Cuenta: ").append(cuenta.getNumeroCuenta())
+                                    .append(" - Saldo: ").append(cuenta.getSaldoDisponible()).append("\n");
+                        }
+                        output.writeUTF(banckAccounts.toString());
+                        break;
+
+                    case "2":
+                        BankAccount nueva = new BankAccount();
+                        if (user.getBankAccounts() == null) {
+                            user.setBankAccounts(new ArrayList<>());
+                        }
+                        user.getBankAccounts().add(nueva);
+                        Data.getInstance().guardarUsuario(user);
+                        output.writeUTF("Cuenta creada con éxito: " + nueva.getNumeroCuenta());
+                        break;
+
+                    case "3":
+                        output.writeUTF("Ingrese número de cuenta:");
+                        String depCuenta = input.readUTF();
+                        output.writeUTF("Ingrese monto:");
+                        double monto = Double.parseDouble(input.readUTF());
+
+                        TransactionDTO dtoDep = new TransactionDTO();
+                        dtoDep.userId = user.getId();
+                        dtoDep.accountNumber = depCuenta;
+                        dtoDep.amount = monto;
+
+                        output.writeUTF(transactionsService.deposit(dtoDep));
+                        break;
+
+                    case "4":
+                        output.writeUTF("Ingrese número de cuenta:");
+                        String retCuenta = input.readUTF();
+                        output.writeUTF("Ingrese monto:");
+                        double montoRet = Double.parseDouble(input.readUTF());
+
+                        TransactionDTO dtoRet = new TransactionDTO();
+                        dtoRet.userId = user.getId();
+                        dtoRet.accountNumber = retCuenta;
+                        dtoRet.amount = montoRet;
+
+                        output.writeUTF(transactionsService.withdraw(dtoRet));
+                        break;
+
+                    case "5":
+                        output.writeUTF("Ingrese número de cuenta:");
+                        String invCuenta = input.readUTF();
+                        output.writeUTF("Ingrese monto:");
+                        double montoInv = Double.parseDouble(input.readUTF());
+
+                        TransactionDTO dtoInv = new TransactionDTO();
+                        dtoInv.userId = user.getId();
+                        dtoInv.accountNumber = invCuenta;
+                        dtoInv.amount = montoInv;
+
+                        output.writeUTF(transactionsService.invertir(dtoInv));
+                        break;
+
+                    case "6":
+                        output.writeUTF("Ingrese número de cuenta:");
+                        String estadoCuenta = input.readUTF();
+                        output.writeUTF(transactionsService.accountStatus(user.getId(), estadoCuenta));
+                        break;
+
+                    case "7":
+                        authService.logout(user.getId());
+                        output.writeUTF("Sesión cerrada correctamente.");
+                        running = false;
+                        break;
+
+                    default:
+                        output.writeUTF("Opción no válida.");
+                        break;
+                }
+            } catch (Exception e) {
+                output.writeUTF("Error: " + e.getMessage());
             }
         }
     }
