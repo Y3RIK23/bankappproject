@@ -12,7 +12,8 @@ import java.util.ArrayList;
  *
  * @author Gigabyte
  */
-public class User {    
+public class User {   
+    
     private String id;
     private String password;
     private ArrayList<BankAccount> bankAccounts;
@@ -23,39 +24,38 @@ public class User {
         
     }
 
-    public ArrayList<BankAccount> getBankAccounts() {
-        return bankAccounts;
-    }
-
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-   
-    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
-        this.bankAccounts = bankAccounts;
-    }
-
-    public boolean isAlreadyActive() {
-        return alreadyActive;
     }
 
     public String getPassword() {
         return password;
     }
 
-    public void setAlreadyActive(boolean alreadyActive) {
-        this.alreadyActive = alreadyActive;
+    public ArrayList<BankAccount> getBankAccounts() {
+        return bankAccounts;
+    }
+
+    public boolean isAlreadyActive() {
+        return alreadyActive;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
+    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
+    }
+
+    public void setAlreadyActive(boolean alreadyActive) {
+        this.alreadyActive = alreadyActive;
+    }
+    
     @Override
     public String toString() {
         return "User{id=" + id + ", password=" + password + ", bankAccounts=" + bankAccounts + ", alreadyActive=" + alreadyActive + '}';

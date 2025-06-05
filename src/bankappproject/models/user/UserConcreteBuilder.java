@@ -64,9 +64,5 @@ public class UserConcreteBuilder implements UserAbstractBuilder{
         
     }
 
-    @Override
-    public void buildActiveState() throws UserException {
-        user.setAlreadyActive(false);
-    }
     
 }

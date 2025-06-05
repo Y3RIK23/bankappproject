@@ -5,90 +5,56 @@ import java.util.UUID;
 
 public class BankAccount {
 
-    private String userID;
-    private String accountNumber;
-    private int balance;
-    private ArrayList<Transaction> transactions;
+   private static int numCuentas = 1;
 
-    // Constructor privado: solo accesible a través del Builder
-    private BankAccount(Builder builder) {
-        
-        this.userID = 
-                builder.userID;
-        this.accountNumber = 
-                builder.accountNumber != null ? builder.accountNumber : UUID.randomUUID().toString();
-        this.balance = 
-                builder.balance;
-        this.transactions = 
-                builder.transactions != null ? builder.transactions : new ArrayList<>();
-    
+    private ArrayList<Transaction> estadoCuenta;
+    private String numeroCuenta;
+    private double saldoDisponible;
+
+    public BankAccount() {
+
+        this.saldoDisponible = 0.0;
+        this.numeroCuenta = numCuentas++ + "";
+
+        for (int i = numeroCuenta.length(); i < 10; i++) {
+
+            this.numeroCuenta += "0";
+
+        }
+
     }
 
-    // Getters
-    public String getUserID() {
-        return userID;
+    public ArrayList<Transaction> getEstadoCuenta() {
+        return estadoCuenta;
     }
 
-    public String getAccountNumber() {
-        return accountNumber;
+    public String getNumeroCuenta() {
+        return numeroCuenta;
     }
 
-    public int getBalance() {
-        return balance;
+    public double getSaldoDisponible() {
+        return saldoDisponible;
     }
 
-    public ArrayList<Transaction> getTransactions() {
-        // TODO: Poblar desde la base de datos si es necesario
-        return transactions;
+    public void setEstadoCuenta(ArrayList<Transaction> estadoCuenta) {
+        this.estadoCuenta = estadoCuenta;
     }
 
-    // Métodos para modificar estado
-    public void agregarTransaccion(Transaction transaction) {
-        transactions.add(transaction);
+    public void setNumeroCuenta(String numeroCuenta) {
+        this.numeroCuenta = numeroCuenta;
     }
 
-    public void actualizarSaldo(int newBalance) {
-        this.balance = newBalance;
+    public void setSaldoDisponible(double saldoDisponible) {
+        this.saldoDisponible = saldoDisponible;
     }
-    
+   
+
     // Se puede modificar para que funcione con el estado de cuenta //
     @Override
     public String toString() {
-        return "BankAccount{" + 
-                "numeroCuenta=" + accountNumber + 
-                ", saldoDisponible=" + balance + '}';
-    }   
-
-    // Builder estático
-    public static class Builder {
-        
-        private String userID;
-        private String accountNumber; // opcional
-        private int balance;
-        private ArrayList<Transaction> transactions;
-
-        public Builder setUserID(String userID) {
-            this.userID = userID;
-            return this;
-        }
-
-        public Builder setNumberAccount(String accountNumber) {
-            this.accountNumber = accountNumber;
-            return this;
-        }
-
-        public Builder setBalance(int balance) {
-            this.balance = balance;
-            return this;
-        }
-
-        public Builder setTransactions(ArrayList<Transaction> transactions) {
-            this.transactions = transactions;
-            return this;
-        }
-
-        public BankAccount build() {
-            return new BankAccount(this);
-        }
+        return "BankAccount{"
+                + "numeroCuenta=" + numeroCuenta
+                + ", saldoDisponible=" + saldoDisponible + '}';
     }
+
 }

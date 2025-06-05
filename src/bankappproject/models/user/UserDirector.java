@@ -11,18 +11,11 @@ package bankappproject.models.user;
 public class UserDirector {
     
     public User construirAlerta (UserAbstractBuilder builder, 
-            String ID, String password) throws UserException{
-        
-        try {
-            
-            builder.buildID(ID);
-            builder.buildPassword(password);
-            
-        } catch (Exception e) {
-        
-            throw new UserException(e.getMessage());
-        
-        }
+            String ID, String password) 
+            throws UserException{
+                
+        builder.buildID(ID);
+        builder.buildPassword(password);
         
         return builder.getUser();
     

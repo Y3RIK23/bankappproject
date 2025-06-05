@@ -14,8 +14,6 @@ public interface UserAbstractBuilder {
     
     void buildPassword (String password) throws UserException;
     
-    void buildActiveState() throws UserException;
-    
     User getUser ();
     
 }
