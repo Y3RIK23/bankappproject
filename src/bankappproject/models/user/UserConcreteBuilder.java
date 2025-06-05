@@ -5,6 +5,7 @@
 package bankappproject.models.user;
 import bankappproject.models.bankAccount.BankAccount;
 import bankappproject.models.user.User;
+import bankappproject.server.db.Data;
 
 import java.util.ArrayList;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 public class UserConcreteBuilder implements UserAbstractBuilder{
 
     User user;
+    Data database = Data.getInstance();
     
     public UserConcreteBuilder() {
         
@@ -26,6 +28,10 @@ public class UserConcreteBuilder implements UserAbstractBuilder{
     public void buildID(String ID) throws UserException{
 
         // FALTA VALIDAR QUE NO EXISTA UN USUARIO CON EL ID RECIBIDO // 
+        
+        if(database.existeUsuario(ID)) {
+            throw new UserException("Este usuario ya existe");
+        }
         
         if (!ID.matches("\\d+")) throw new UserException (
                 "El ID solo puede contener numeros");

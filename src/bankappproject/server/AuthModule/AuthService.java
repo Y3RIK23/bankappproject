@@ -46,13 +46,7 @@ public class AuthService {
     }
 
     public String register(User user) throws IllegalArgumentException {
-        if (data.existeUsuario(user.getId())) {
-            throw new IllegalArgumentException(String.format("Usuario %s ya existe", user.getId()));
-        }
-
-        user.setAlreadyActive(false);
         data.guardarUsuario(user);
-
         return String.format("Usuario %s registrado correctamente", user.getId());
     }
 }
