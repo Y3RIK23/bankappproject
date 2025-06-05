@@ -1,13 +1,14 @@
 package bankappproject.server.AuthModule;
 
 import bankappproject.models.user.User;
+import bankappproject.server.db.Data;
 
 public class AuthService {
 
-    private final UserSchema userHandler = new UserSchema();
+    private final Data data = Data.getInstance();
 
     public String login(LoginDTO loginData) throws IllegalArgumentException {
-        User user = userHandler.findById(loginData.cedula);
+        User user = data.buscarUsuarioPorId(loginData.cedula);
 
         if (user == null) {
             throw new IllegalArgumentException(String.format("Usuario %s no existe", loginData.cedula));
@@ -22,13 +23,13 @@ public class AuthService {
         }
 
         user.setAlreadyActive(true);
-        userHandler.save(user);
+        data.guardarUsuario(user);
 
         return String.format("Bienvenido %s", user.getId());
     }
 
     public String logout(String cedula) throws IllegalArgumentException {
-        User user = userHandler.findById(cedula);
+        User user = data.buscarUsuarioPorId(cedula);
 
         if (user == null) {
             throw new IllegalArgumentException(String.format("Usuario %s no existe", cedula));
@@ -39,18 +40,18 @@ public class AuthService {
         }
 
         user.setAlreadyActive(false);
-        userHandler.save(user);
+        data.guardarUsuario(user);
 
         return String.format("Cerrando sesión de %s", user.getId());
     }
 
     public String register(User user) throws IllegalArgumentException {
-        if (userHandler.findById(user.getId()) != null) {
+        if (data.existeUsuario(user.getId())) {
             throw new IllegalArgumentException(String.format("Usuario %s ya existe", user.getId()));
         }
 
         user.setAlreadyActive(false);
-        userHandler.save(user);
+        data.guardarUsuario(user);
 
         return String.format("Usuario %s registrado correctamente", user.getId());
     }
