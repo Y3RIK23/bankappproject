@@ -76,6 +76,43 @@ public class TransactionsService {
         return String.format("Retiro exitoso. Nuevo saldo: %.2f en la cuenta %s", nuevoSaldo, cuenta.getNumeroCuenta());
     }
 
+    public synchronized String invertir(TransactionDTO dto) throws IllegalArgumentException, InterruptedException {
+        if (dto.amount <= 0) {
+            throw new IllegalArgumentException("El monto debe ser mayor a 0");
+        }
+
+        User user = data.buscarUsuarioPorId(dto.userId);
+        if (user == null) {
+            throw new IllegalArgumentException("Usuario no encontrado");
+        }
+
+        BankAccount cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
+        if (cuenta == null) {
+            throw new IllegalArgumentException("Cuenta no encontrada para el usuario");
+        }
+
+        if (cuenta.getSaldoDisponible() < dto.amount) {
+            throw new IllegalArgumentException("Saldo insuficiente");
+        }
+
+        this.withdraw(dto);
+
+        Thread.sleep(60000);
+
+        dto.amount = dto.amount * 1.10;
+
+        this.deposit(dto);
+
+        Transaction transaccion = new Transaction(new Date(), Transaction.TransaccionType.INVERSION, dto.amount);
+        cuenta.getEstadoCuenta().add(transaccion);
+        
+        data.guardarUsuario(user);
+
+
+        return String.format("Certificado de Inversion exitoso. Nuevo saldo: %.2f en la cuenta %s", dto.amount, cuenta.getNumeroCuenta());
+
+    }
+
     // Método auxiliar para encontrar una cuenta por número sin usar Optional ni Stream
     private BankAccount buscarCuentaPorNumero(User user, String numeroCuenta) {
         for (BankAccount cuenta : user.getBankAccounts()) {
