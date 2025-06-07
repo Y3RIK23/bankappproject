@@ -59,7 +59,7 @@ public class Cliente {
                         || mensaje.contains("Sesión cerrada correctamente.")) {
                     JOptionPane.showMessageDialog(null, mensaje);
                     activo = false;
-                    continue;
+                    break;
                 }
 
                 // Determinar si el mensaje requiere entrada del usuario
