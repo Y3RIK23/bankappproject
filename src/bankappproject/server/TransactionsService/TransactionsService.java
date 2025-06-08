@@ -95,13 +95,17 @@ public class TransactionsService {
             throw new IllegalArgumentException("Saldo insuficiente");
         }
 
-        this.withdraw(dto);
+//        this.withdraw(dto);
+        double nuevoSaldo = cuenta.getSaldoDisponible() - dto.amount;
+        cuenta.setSaldoDisponible(nuevoSaldo);
 
-        Thread.sleep(60000);
+        Thread.sleep(1000);
 
-        dto.amount = dto.amount * 1.10;
+        dto.amount += dto.amount * 0.10;
 
-        this.deposit(dto);
+//        this.deposit(dto);
+        nuevoSaldo = cuenta.getSaldoDisponible() + dto.amount;
+        cuenta.setSaldoDisponible(nuevoSaldo);
 
         Transaction transaccion = new Transaction(new Date(), Transaction.TransaccionType.INVERSION, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
