@@ -75,8 +75,12 @@ public class Cliente {
                         // Usuario presionó Cancelar
                         // En login o registro: volver al inicio
                         // En menú: cerrar sesión o salir
-                        // Se envía "3", que en servidor es Salir / Cerrar sesión
-                        output.writeUTF("3");
+                        // Se envía "3" o "7", que en servidor es Salir / Cerrar sesión
+                        if (mensaje.contains("Menú:")) {
+                            output.writeUTF("7");
+                        } else {
+                            output.writeUTF("3");
+                        }
                     } else {
                         output.writeUTF(entrada);
                     }
