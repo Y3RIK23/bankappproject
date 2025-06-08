@@ -26,7 +26,7 @@ public class Cliente {
         try {
             connectToServer();
             getStreams();
-            processConnection();
+            procesarConexion();
         } catch (IOException ex) {
             ex.printStackTrace();
         } finally {
@@ -46,7 +46,7 @@ public class Cliente {
         input = new DataInputStream(client.getInputStream());
     }
 
-    public void processConnection() {
+    public void procesarConexion() {
         try {
             boolean activo = true;
 

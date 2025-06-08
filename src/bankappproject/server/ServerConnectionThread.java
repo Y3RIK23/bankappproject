@@ -32,45 +32,59 @@ public class ServerConnectionThread extends Thread {
         input = new DataInputStream(connection.getInputStream());
     }
 
-    private void processClient() throws IOException {
-        User user = null;
-        boolean authenticated = false;
+    private void procesarCliente() throws IOException {
+        // Usuario autenticado (nulo inicialmente)
+        User usuario = null;
+        boolean autenticado = false;
 
-        while (!authenticated) {
+        // Bucle de autenticación: se repite hasta que el usuario inicie sesión correctamente
+        while (!autenticado) {
             output.writeUTF("Seleccione una opción:\n1 - Iniciar sesión\n2 - Registrar\n3 - Salir");
-            String option = input.readUTF();
+            String opcion = input.readUTF();
 
-            switch (option) {
+            switch (opcion) {
                 case "1":
+                    // Proceso de inicio de sesión
                     output.writeUTF("Ingrese cédula:");
                     String cedula = input.readUTF();
                     output.writeUTF("Ingrese contraseña:");
-                    String pass = input.readUTF();
+                    String clave = input.readUTF();
 
                     try {
-                        LoginDTO dto = new LoginDTO();
-                        dto.cedula = cedula;
-                        dto.contraseña = pass;
-                        output.writeUTF(authService.login(dto));
-                        user = Data.getInstance().buscarUsuarioPorId(cedula);
-                        authenticated = true;
+                        // Crear DTO con credenciales ingresadas
+                        LoginDTO datosInicioSesion = new LoginDTO();
+                        datosInicioSesion.cedula = cedula;
+                        datosInicioSesion.contraseña = clave;
+
+                        // Intentar autenticación
+                        output.writeUTF(authService.login(datosInicioSesion));
+
+                        // Si se autentica correctamente, obtener el usuario
+                        usuario = Data.getInstance().buscarUsuarioPorId(cedula);
+                        autenticado = true;
                     } catch (IllegalArgumentException e) {
                         output.writeUTF("Error: " + e.getMessage());
                     }
                     break;
 
                 case "2":
+                    // Proceso de registro de nuevo usuario
                     output.writeUTF("Ingrese cédula:");
-                    String newID = input.readUTF();
+                    String nuevaCedula = input.readUTF();
                     output.writeUTF("Ingrese contraseña:");
-                    String newPass = input.readUTF();
+                    String nuevaClave = input.readUTF();
 
                     try {
-                        UserConcreteBuilder builder = new UserConcreteBuilder();
-                        UserDirector director = new UserDirector();
-                        User nuevo = director.construirAlerta(builder, newID, newPass);
-                        nuevo.setAlreadyActive(false);
-                        authService.register(nuevo);
+                        // Usar patrón Builder para construir un nuevo usuario
+                        UserConcreteBuilder constructorUsuario = new UserConcreteBuilder();
+                        UserDirector directorUsuario = new UserDirector();
+                        User nuevoUsuario = directorUsuario.construirAlerta(constructorUsuario, nuevaCedula, nuevaClave);
+
+                        // Indicar que aún no ha iniciado sesión
+                        nuevoUsuario.setAlreadyActive(false);
+
+                        // Registrar el nuevo usuario
+                        authService.register(nuevoUsuario);
                         output.writeUTF("Registro exitoso. Ahora puede iniciar sesión.");
                     } catch (UserException | IllegalArgumentException e) {
                         output.writeUTF("Error: " + e.getMessage());
@@ -78,6 +92,7 @@ public class ServerConnectionThread extends Thread {
                     break;
 
                 case "3":
+                    // Salir del sistema
                     output.writeUTF("Saliendo...");
                     return;
 
@@ -86,85 +101,98 @@ public class ServerConnectionThread extends Thread {
             }
         }
 
-        boolean running = true;
+        // Usuario autenticado: inicia menú de operaciones bancarias
+        boolean activo = true;
 
-        while (running) {
+        while (activo) {
             output.writeUTF("Menú:\n1 - Ver cuentas\n2 - Crear cuenta\n3 - Depositar\n4 - Retirar\n5 - Inversión\n6 - Estado de cuenta\n7 - Cerrar sesión");
             String opcion = input.readUTF();
 
             try {
                 switch (opcion) {
                     case "1":
-                        StringBuilder banckAccounts = new StringBuilder("Cuentas:\n");
-                        for (BankAccount cuenta : user.getBankAccounts()) {
-                            banckAccounts.append("Cuenta: ").append(cuenta.getNumeroCuenta())
+                        // Mostrar todas las cuentas del usuario
+                        StringBuilder cuentas = new StringBuilder("Cuentas:\n");
+                        for (BankAccount cuenta : usuario.getBankAccounts()) {
+                            cuentas.append("Cuenta: ").append(cuenta.getNumeroCuenta())
                                     .append(" - Saldo: ").append(cuenta.getSaldoDisponible()).append("\n");
                         }
-                        output.writeUTF(banckAccounts.toString());
+                        output.writeUTF(cuentas.toString());
                         break;
 
                     case "2":
-                        BankAccount nueva = new BankAccount();
-                        if (user.getBankAccounts() == null) {
-                            user.setBankAccounts(new ArrayList<>());
+                        // Crear una nueva cuenta bancaria
+                        BankAccount nuevaCuenta = new BankAccount();
+
+                        // Inicializar lista de cuentas si es null
+                        if (usuario.getBankAccounts() == null) {
+                            usuario.setBankAccounts(new ArrayList<>());
                         }
-                        user.getBankAccounts().add(nueva);
-                        Data.getInstance().guardarUsuario(user);
-                        output.writeUTF("Cuenta creada con éxito: " + nueva.getNumeroCuenta());
+
+                        // Agregar nueva cuenta al usuario y guardar cambios
+                        usuario.getBankAccounts().add(nuevaCuenta);
+                        Data.getInstance().guardarUsuario(usuario);
+                        output.writeUTF("Cuenta creada con éxito: " + nuevaCuenta.getNumeroCuenta());
                         break;
 
                     case "3":
+                        // Proceso de depósito
                         output.writeUTF("Ingrese número de cuenta:");
-                        String depCuenta = input.readUTF();
+                        String cuentaDeposito = input.readUTF();
                         output.writeUTF("Ingrese monto:");
                         double monto = Double.parseDouble(input.readUTF());
 
-                        TransactionDTO dtoDep = new TransactionDTO();
-                        dtoDep.userId = user.getId();
-                        dtoDep.accountNumber = depCuenta;
-                        dtoDep.amount = monto;
+                        // Crear DTO para realizar el depósito
+                        TransactionDTO dtoDeposito = new TransactionDTO();
+                        dtoDeposito.userId = usuario.getId();
+                        dtoDeposito.accountNumber = cuentaDeposito;
+                        dtoDeposito.amount = monto;
 
-                        output.writeUTF(transactionsService.deposit(dtoDep));
+                        output.writeUTF(transactionsService.deposit(dtoDeposito));
                         break;
 
                     case "4":
+                        // Proceso de retiro
                         output.writeUTF("Ingrese número de cuenta:");
-                        String retCuenta = input.readUTF();
+                        String cuentaRetiro = input.readUTF();
                         output.writeUTF("Ingrese monto:");
-                        double montoRet = Double.parseDouble(input.readUTF());
+                        double montoRetiro = Double.parseDouble(input.readUTF());
 
-                        TransactionDTO dtoRet = new TransactionDTO();
-                        dtoRet.userId = user.getId();
-                        dtoRet.accountNumber = retCuenta;
-                        dtoRet.amount = montoRet;
+                        TransactionDTO dtoRetiro = new TransactionDTO();
+                        dtoRetiro.userId = usuario.getId();
+                        dtoRetiro.accountNumber = cuentaRetiro;
+                        dtoRetiro.amount = montoRetiro;
 
-                        output.writeUTF(transactionsService.withdraw(dtoRet));
+                        output.writeUTF(transactionsService.withdraw(dtoRetiro));
                         break;
 
                     case "5":
+                        // Proceso de inversión
                         output.writeUTF("Ingrese número de cuenta:");
-                        String invCuenta = input.readUTF();
+                        String cuentaInversion = input.readUTF();
                         output.writeUTF("Ingrese monto:");
-                        double montoInv = Double.parseDouble(input.readUTF());
+                        double montoInversion = Double.parseDouble(input.readUTF());
 
-                        TransactionDTO dtoInv = new TransactionDTO();
-                        dtoInv.userId = user.getId();
-                        dtoInv.accountNumber = invCuenta;
-                        dtoInv.amount = montoInv;
+                        TransactionDTO dtoInversion = new TransactionDTO();
+                        dtoInversion.userId = usuario.getId();
+                        dtoInversion.accountNumber = cuentaInversion;
+                        dtoInversion.amount = montoInversion;
 
-                        output.writeUTF(transactionsService.invertir(dtoInv));
+                        output.writeUTF(transactionsService.invertir(dtoInversion));
                         break;
 
                     case "6":
+                        // Consultar estado de cuenta
                         output.writeUTF("Ingrese número de cuenta:");
-                        String estadoCuenta = input.readUTF();
-                        output.writeUTF(transactionsService.accountStatus(user.getId(), estadoCuenta));
+                        String numeroCuentaEstado = input.readUTF();
+                        output.writeUTF(transactionsService.accountStatus(usuario.getId(), numeroCuentaEstado));
                         break;
 
                     case "7":
-                        authService.logout(user.getId());
+                        // Cerrar sesión del usuario
+                        authService.logout(usuario.getId());
                         output.writeUTF("Sesión cerrada correctamente.");
-                        running = false;
+                        activo = false;
                         break;
 
                     default:
@@ -180,7 +208,7 @@ public class ServerConnectionThread extends Thread {
     public void run() {
         try {
             getStreams();
-            processClient();
+            procesarCliente();
         } catch (IOException ex) {
             System.err.println(ex.getMessage());
             ex.printStackTrace();
