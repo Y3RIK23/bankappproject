@@ -1,8 +1,8 @@
-package bankappproject.models.bankAccount;
+package bankappproject.funciones.transaccion;
 
 import java.util.Date;
 
-public class Transaction {
+public class Transaccion {
 
     public enum TransaccionType {
         RETIRO,
@@ -20,7 +20,7 @@ public class Transaction {
     private double monto;
     private TransaccionType tipoTransaccion;
 
-    public Transaction(
+    public Transaccion(
             Date fecha, TransaccionType transaccionType, double monto) {
 
         if (transaccionType == TransaccionType.DEPOSITO) {

@@ -1,17 +1,18 @@
-package bankappproject.models.bankAccount;
+package bankappproject.modelos;
 
+import bankappproject.funciones.transaccion.Transaccion;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-public class BankAccount {
+public class CuentaBancaria {
 
     private static int numCuentas = 1;
 
-    private ArrayList<Transaction> estadoCuenta;
+    private ArrayList<Transaccion> estadoCuenta;
     private String numeroCuenta;
     private double saldoDisponible;
 
-    public BankAccount() {
+    public CuentaBancaria() {
 
         this.saldoDisponible = 0.0;
         this.numeroCuenta = numCuentas++ + "";
@@ -25,7 +26,7 @@ public class BankAccount {
 
     }
 
-    public ArrayList<Transaction> getEstadoCuenta() {
+    public ArrayList<Transaccion> getEstadoCuenta() {
         return estadoCuenta;
     }
 
@@ -37,7 +38,7 @@ public class BankAccount {
         return saldoDisponible;
     }
 
-    public void setEstadoCuenta(ArrayList<Transaction> estadoCuenta) {
+    public void setEstadoCuenta(ArrayList<Transaccion> estadoCuenta) {
         this.estadoCuenta = estadoCuenta;
     }
 
@@ -49,7 +50,7 @@ public class BankAccount {
         this.saldoDisponible = saldoDisponible;
     }
 
-    public void addTransaccion(Transaction transaction) {
+    public void addTransaccion(Transaccion transaction) {
         this.estadoCuenta.add(transaction);
     }
 
@@ -67,9 +68,9 @@ public class BankAccount {
         double debitos = 0;
         double creditos = 0;
 
-        for (Transaction transaction : estadoCuenta) {
+        for (Transaccion transaction : estadoCuenta) {
 
-            if (transaction.getTipoTransaccion() == Transaction.TransaccionType.DEPOSITO) {
+            if (transaction.getTipoTransaccion() == Transaccion.TransaccionType.DEPOSITO) {
 
                 sb.append(String.format(
                         "%-15s %-15s %-15s %15.2f %n",

@@ -1,28 +1,27 @@
-package bankappproject.server.TransactionsService;
+package bankappproject.funciones.transaccion;
 
-import bankappproject.models.bankAccount.BankAccount;
-import bankappproject.models.bankAccount.Transaction;
-import bankappproject.models.user.User;
-import bankappproject.server.db.Data;
+import bankappproject.modelos.CuentaBancaria;
+import bankappproject.modelos.usuario.Usuario;
+import bankappproject.funciones.baseDatos.Datos;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class TransactionsService {
+public class Transacciones {
 
-    private final Data data = Data.getInstance();
+    private final Datos data = Datos.getInstance();
 
-    public String deposit(TransactionDTO dto) throws IllegalArgumentException {
+    public String deposit(TransaccionDTO dto) throws IllegalArgumentException {
         if (dto.amount <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        User user = data.buscarUsuarioPorId(dto.userId);
+        Usuario user = data.buscarUsuarioPorId(dto.userId);
         if (user == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
 
-        BankAccount cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
+        CuentaBancaria cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
         if (cuenta == null) {
             throw new IllegalArgumentException("Cuenta no encontrada para el usuario");
         }
@@ -34,7 +33,7 @@ public class TransactionsService {
             cuenta.setEstadoCuenta(new ArrayList<>());
         }
 
-        Transaction transaccion = new Transaction(new Date(), Transaction.TransaccionType.DEPOSITO, dto.amount);
+        Transaccion transaccion = new Transaccion(new Date(), Transaccion.TransaccionType.DEPOSITO, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
 
         data.guardarUsuario(user);
@@ -42,17 +41,17 @@ public class TransactionsService {
         return String.format("Depósito exitoso. Nuevo saldo: %.2f en la cuenta %s", nuevoSaldo, cuenta.getNumeroCuenta());
     }
 
-    public String withdraw(TransactionDTO dto) throws IllegalArgumentException {
+    public String withdraw(TransaccionDTO dto) throws IllegalArgumentException {
         if (dto.amount <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        User user = data.buscarUsuarioPorId(dto.userId);
+        Usuario user = data.buscarUsuarioPorId(dto.userId);
         if (user == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
 
-        BankAccount cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
+        CuentaBancaria cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
         if (cuenta == null) {
             throw new IllegalArgumentException("Cuenta no encontrada para el usuario");
         }
@@ -68,7 +67,7 @@ public class TransactionsService {
             cuenta.setEstadoCuenta(new ArrayList<>());
         }
 
-        Transaction transaccion = new Transaction(new Date(), Transaction.TransaccionType.RETIRO, dto.amount);
+        Transaccion transaccion = new Transaccion(new Date(), Transaccion.TransaccionType.RETIRO, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
 
         data.guardarUsuario(user);
@@ -76,17 +75,17 @@ public class TransactionsService {
         return String.format("Retiro exitoso. Nuevo saldo: %.2f en la cuenta %s", nuevoSaldo, cuenta.getNumeroCuenta());
     }
 
-    public synchronized String invertir(TransactionDTO dto) throws IllegalArgumentException, InterruptedException {
+    public synchronized String invertir(TransaccionDTO dto) throws IllegalArgumentException, InterruptedException {
         if (dto.amount <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        User user = data.buscarUsuarioPorId(dto.userId);
+        Usuario user = data.buscarUsuarioPorId(dto.userId);
         if (user == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
 
-        BankAccount cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
+        CuentaBancaria cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
         if (cuenta == null) {
             throw new IllegalArgumentException("Cuenta no encontrada para el usuario");
         }
@@ -105,7 +104,7 @@ public class TransactionsService {
         nuevoSaldo = cuenta.getSaldoDisponible() + dto.amount;
         cuenta.setSaldoDisponible(nuevoSaldo);
 
-        Transaction transaccion = new Transaction(new Date(), Transaction.TransaccionType.INVERSION, dto.amount);
+        Transaccion transaccion = new Transaccion(new Date(), Transaccion.TransaccionType.INVERSION, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
 
         data.guardarUsuario(user);
@@ -115,8 +114,8 @@ public class TransactionsService {
     }
 
     // Método auxiliar para encontrar una cuenta por número sin usar Optional ni Stream
-    private BankAccount buscarCuentaPorNumero(User user, String numeroCuenta) {
-        for (BankAccount cuenta : user.getBankAccounts()) {
+    private CuentaBancaria buscarCuentaPorNumero(Usuario user, String numeroCuenta) {
+        for (CuentaBancaria cuenta : user.getBankAccounts()) {
             if (cuenta.getNumeroCuenta().equals(numeroCuenta)) {
                 return cuenta;
             }
@@ -125,12 +124,12 @@ public class TransactionsService {
     }
 
     public String accountStatus(String userId, String accountNumber) {
-        User user = Data.getInstance().buscarUsuarioPorId(userId);
+        Usuario user = Datos.getInstance().buscarUsuarioPorId(userId);
         if (user == null) {
             throw new IllegalArgumentException("Usuario no encontrado.");
         }
 
-        for (BankAccount cuenta : user.getBankAccounts()) {
+        for (CuentaBancaria cuenta : user.getBankAccounts()) {
             if (cuenta.getNumeroCuenta().equals(accountNumber)) {
                 return cuenta.estadoCuenta();
             }

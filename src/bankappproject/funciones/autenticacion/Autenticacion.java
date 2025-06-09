@@ -1,14 +1,14 @@
-package bankappproject.server.AuthModule;
+package bankappproject.funciones.autenticacion;
 
-import bankappproject.models.user.User;
-import bankappproject.server.db.Data;
+import bankappproject.modelos.usuario.Usuario;
+import bankappproject.funciones.baseDatos.Datos;
 
-public class AuthService {
+public class Autenticacion {
 
-    private final Data data = Data.getInstance();
+    private final Datos datos = Datos.getInstance();
 
-    public String login(LoginDTO loginData) throws IllegalArgumentException {
-        User user = data.buscarUsuarioPorId(loginData.cedula);
+    public String inicioSesion(InicioSesionDTO loginData) throws IllegalArgumentException {
+        Usuario user = datos.buscarUsuarioPorId(loginData.cedula);
 
         if (user == null) {
             throw new IllegalArgumentException(String.format("Usuario %s no existe", loginData.cedula));
@@ -23,13 +23,13 @@ public class AuthService {
         }
 
         user.setAlreadyActive(true);
-        data.guardarUsuario(user);
+        datos.guardarUsuario(user);
 
         return String.format("Bienvenido %s", user.getId());
     }
 
     public String logout(String cedula) throws IllegalArgumentException {
-        User user = data.buscarUsuarioPorId(cedula);
+        Usuario user = datos.buscarUsuarioPorId(cedula);
 
         if (user == null) {
             throw new IllegalArgumentException(String.format("Usuario %s no existe", cedula));
@@ -40,13 +40,13 @@ public class AuthService {
         }
 
         user.setAlreadyActive(false);
-        data.guardarUsuario(user);
+        datos.guardarUsuario(user);
 
         return String.format("Cerrando sesión de %s", user.getId());
     }
 
-    public String register(User user) throws IllegalArgumentException {
-        data.guardarUsuario(user);
+    public String register(Usuario user) throws IllegalArgumentException {
+        datos.guardarUsuario(user);
         return String.format("Usuario %s registrado correctamente", user.getId());
     }
 }

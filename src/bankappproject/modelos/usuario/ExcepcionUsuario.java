@@ -2,15 +2,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.models.user;
+package bankappproject.modelos.usuario;
 
 /**
  *
  * @author mejia
  */
-public class UserException extends Exception {
+public class ExcepcionUsuario extends Exception {
 
-    public UserException(String message) {
+    public ExcepcionUsuario(String message) {
         super(message);
     }        
     

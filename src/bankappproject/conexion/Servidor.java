@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.server;
+package bankappproject.conexion;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -12,7 +12,7 @@ import java.net.Socket;
  *
  * @author Usuario
  */
-public class Server {
+public class Servidor {
 
     private ServerSocket server;
     private final int PORT = 12345;
@@ -21,7 +21,7 @@ public class Server {
         try {
             server = new ServerSocket(PORT);
             while (true) {
-                ServerConnectionThread thread = new ServerConnectionThread(waitForConnection());
+                HiloServidor thread = new HiloServidor(waitForConnection());
                 thread.start();
             }
         } catch (IOException ex) {
@@ -48,6 +48,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-        new Server().runServer();
+        new Servidor().runServer();
     }
 }

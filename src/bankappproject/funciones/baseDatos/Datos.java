@@ -1,40 +1,40 @@
-package bankappproject.server.db;
+package bankappproject.funciones.baseDatos;
 
-import bankappproject.models.user.User;
+import bankappproject.modelos.usuario.Usuario;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-public class Data {
+public class Datos {
 
-    private static Data instance;
+    private static Datos instance;
 
-    private final TreeMap<String, User> storage;
+    private final TreeMap<String, Usuario> storage;
 
-    private Data() {
+    private Datos() {
         this.storage = new TreeMap<>();
     }
 
-    public static synchronized Data getInstance() {
+    public static synchronized Datos getInstance() {
         if (instance == null) {
-            instance = new Data();
+            instance = new Datos();
         }
         return instance;
     }
 
     // Devuelve acceso directo al mapa si se necesita externamente (uso avanzado)
-    public TreeMap<String, User> getDatabase() {
+    public TreeMap<String, Usuario> getDatabase() {
         return storage;
     }
 
     // === CRUD de Usuario ===
 
-    public void guardarUsuario(User user) {
+    public void guardarUsuario(Usuario user) {
         storage.put(user.getId(), user);
     }
 
-    public void actualizarUsuario(String id, User user) {
+    public void actualizarUsuario(String id, Usuario user) {
         if (storage.containsKey(id)) {
             storage.put(id, user);
         }
@@ -44,11 +44,11 @@ public class Data {
         storage.remove(id);
     }
 
-    public User buscarUsuarioPorId(String id) {
+    public Usuario buscarUsuarioPorId(String id) {
         return storage.get(id);
     }
 
-    public List<User> listarUsuarios() {
+    public List<Usuario> listarUsuarios() {
         return new ArrayList<>(storage.values());
     }
 

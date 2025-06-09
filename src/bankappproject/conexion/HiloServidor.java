@@ -2,28 +2,33 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.server;
+package bankappproject.conexion;
 
-import bankappproject.models.user.*;
-import bankappproject.models.bankAccount.*;
-import bankappproject.server.AuthModule.*;
-import bankappproject.server.TransactionsService.*;
-import bankappproject.server.db.Data;
+import bankappproject.modelos.CuentaBancaria;
+import bankappproject.modelos.usuario.Usuario;
+import bankappproject.modelos.usuario.UsuarioDirector;
+import bankappproject.modelos.usuario.UsuarioConcreteB;
+import bankappproject.modelos.usuario.ExcepcionUsuario;
+import bankappproject.funciones.transaccion.TransaccionDTO;
+import bankappproject.funciones.autenticacion.InicioSesionDTO;
+import bankappproject.funciones.autenticacion.Autenticacion;
+import bankappproject.funciones.transaccion.Transacciones;
+import bankappproject.funciones.baseDatos.Datos;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class ServerConnectionThread extends Thread {
+public class HiloServidor extends Thread {
 
     private DataOutputStream output;
     private DataInputStream input;
     private Socket connection;
 
-    private final AuthService authService = new AuthService();
-    private final TransactionsService transactionsService = new TransactionsService();
+    private final Autenticacion authService = new Autenticacion();
+    private final Transacciones transactionsService = new Transacciones();
 
-    public ServerConnectionThread(Socket connection) {
+    public HiloServidor(Socket connection) {
         this.connection = connection;
     }
 
@@ -34,7 +39,7 @@ public class ServerConnectionThread extends Thread {
 
     private void procesarCliente() throws IOException {
         // Usuario autenticado (nulo inicialmente)
-        User usuario = null;
+        Usuario usuario = null;
         boolean autenticado = false;
 
         // Bucle de autenticación: se repite hasta que el usuario inicie sesión correctamente
@@ -52,15 +57,15 @@ public class ServerConnectionThread extends Thread {
 
                     try {
                         // Crear DTO con credenciales ingresadas
-                        LoginDTO datosInicioSesion = new LoginDTO();
+                        InicioSesionDTO datosInicioSesion = new InicioSesionDTO();
                         datosInicioSesion.cedula = cedula;
                         datosInicioSesion.contraseña = clave;
 
                         // Intentar autenticación
-                        output.writeUTF(authService.login(datosInicioSesion));
+                        output.writeUTF(authService.inicioSesion(datosInicioSesion));
 
                         // Si se autentica correctamente, obtener el usuario
-                        usuario = Data.getInstance().buscarUsuarioPorId(cedula);
+                        usuario = Datos.getInstance().buscarUsuarioPorId(cedula);
                         autenticado = true;
                     } catch (IllegalArgumentException e) {
                         output.writeUTF("Error: " + e.getMessage());
@@ -76,9 +81,9 @@ public class ServerConnectionThread extends Thread {
 
                     try {
                         // Usar patrón Builder para construir un nuevo usuario
-                        UserConcreteBuilder constructorUsuario = new UserConcreteBuilder();
-                        UserDirector directorUsuario = new UserDirector();
-                        User nuevoUsuario = directorUsuario.construirAlerta(constructorUsuario, nuevaCedula, nuevaClave);
+                        UsuarioConcreteB constructorUsuario = new UsuarioConcreteB();
+                        UsuarioDirector directorUsuario = new UsuarioDirector();
+                        Usuario nuevoUsuario = directorUsuario.construirAlerta(constructorUsuario, nuevaCedula, nuevaClave);
 
                         // Indicar que aún no ha iniciado sesión
                         nuevoUsuario.setAlreadyActive(false);
@@ -86,7 +91,7 @@ public class ServerConnectionThread extends Thread {
                         // Registrar el nuevo usuario
                         authService.register(nuevoUsuario);
                         output.writeUTF("Registro exitoso. Ahora puede iniciar sesión.");
-                    } catch (UserException | IllegalArgumentException e) {
+                    } catch (ExcepcionUsuario | IllegalArgumentException e) {
                         output.writeUTF("Error: " + e.getMessage());
                     }
                     break;
@@ -113,7 +118,7 @@ public class ServerConnectionThread extends Thread {
                     case "1":
                         // Mostrar todas las cuentas del usuario
                         StringBuilder cuentas = new StringBuilder("Cuentas:\n");
-                        for (BankAccount cuenta : usuario.getBankAccounts()) {
+                        for (CuentaBancaria cuenta : usuario.getBankAccounts()) {
                             cuentas.append("Cuenta: ").append(cuenta.getNumeroCuenta())
                                     .append(" - Saldo: ").append(cuenta.getSaldoDisponible()).append("\n");
                         }
@@ -122,7 +127,7 @@ public class ServerConnectionThread extends Thread {
 
                     case "2":
                         // Crear una nueva cuenta bancaria
-                        BankAccount nuevaCuenta = new BankAccount();
+                        CuentaBancaria nuevaCuenta = new CuentaBancaria();
 
                         // Inicializar lista de cuentas si es null
                         if (usuario.getBankAccounts() == null) {
@@ -131,7 +136,7 @@ public class ServerConnectionThread extends Thread {
 
                         // Agregar nueva cuenta al usuario y guardar cambios
                         usuario.getBankAccounts().add(nuevaCuenta);
-                        Data.getInstance().guardarUsuario(usuario);
+                        Datos.getInstance().guardarUsuario(usuario);
                         output.writeUTF("Cuenta creada con éxito: " + nuevaCuenta.getNumeroCuenta());
                         break;
 
@@ -143,7 +148,7 @@ public class ServerConnectionThread extends Thread {
                         double monto = Double.parseDouble(input.readUTF());
 
                         // Crear DTO para realizar el depósito
-                        TransactionDTO dtoDeposito = new TransactionDTO();
+                        TransaccionDTO dtoDeposito = new TransaccionDTO();
                         dtoDeposito.userId = usuario.getId();
                         dtoDeposito.accountNumber = cuentaDeposito;
                         dtoDeposito.amount = monto;
@@ -158,7 +163,7 @@ public class ServerConnectionThread extends Thread {
                         output.writeUTF("Ingrese monto:");
                         double montoRetiro = Double.parseDouble(input.readUTF());
 
-                        TransactionDTO dtoRetiro = new TransactionDTO();
+                        TransaccionDTO dtoRetiro = new TransaccionDTO();
                         dtoRetiro.userId = usuario.getId();
                         dtoRetiro.accountNumber = cuentaRetiro;
                         dtoRetiro.amount = montoRetiro;
@@ -173,7 +178,7 @@ public class ServerConnectionThread extends Thread {
                         output.writeUTF("Ingrese monto:");
                         double montoInversion = Double.parseDouble(input.readUTF());
 
-                        TransactionDTO dtoInversion = new TransactionDTO();
+                        TransaccionDTO dtoInversion = new TransaccionDTO();
                         dtoInversion.userId = usuario.getId();
                         dtoInversion.accountNumber = cuentaInversion;
                         dtoInversion.amount = montoInversion;

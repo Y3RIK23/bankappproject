@@ -2,17 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.models.user;
+package bankappproject.modelos.usuario;
 
 /**
  *
  * @author mejia
  */
-public class UserDirector {
+public class UsuarioDirector {
     
-    public User construirAlerta (UserAbstractBuilder builder, 
+    public Usuario construirAlerta (UsuarioAbstractB builder, 
             String ID, String password) 
-            throws UserException{
+            throws ExcepcionUsuario{
                 
         builder.buildID(ID);
         builder.buildPassword(password);

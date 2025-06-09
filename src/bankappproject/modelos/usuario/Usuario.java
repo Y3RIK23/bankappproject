@@ -2,9 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.models.user;
+package bankappproject.modelos.usuario;
 
-import bankappproject.models.bankAccount.BankAccount;
+import bankappproject.modelos.CuentaBancaria;
 
 import java.util.ArrayList;
 
@@ -12,15 +12,15 @@ import java.util.ArrayList;
  *
  * @author Gigabyte
  */
-public class User {   
+public class Usuario {   
     
     private String id;
     private String password;
-    private ArrayList<BankAccount> bankAccounts;
+    private ArrayList<CuentaBancaria> bankAccounts;
 
     private boolean alreadyActive;
 
-    User() {
+    Usuario() {
         
     }
 
@@ -32,7 +32,7 @@ public class User {
         return password;
     }
 
-    public ArrayList<BankAccount> getBankAccounts() {
+    public ArrayList<CuentaBancaria> getBankAccounts() {
         return bankAccounts;
     }
 
@@ -48,7 +48,7 @@ public class User {
         this.password = password;
     }
 
-    public void setBankAccounts(ArrayList<BankAccount> bankAccounts) {
+    public void setBankAccounts(ArrayList<CuentaBancaria> bankAccounts) {
         this.bankAccounts = bankAccounts;
     }
 
