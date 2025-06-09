@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package bankappproject.modelos.usuario;
-import bankappproject.modelos.CuentaBancaria;
 import bankappproject.modelos.usuario.Usuario;
 import bankappproject.funciones.baseDatos.Datos;
 
@@ -26,8 +25,6 @@ public class UsuarioConcreteB implements UsuarioAbstractB{
 
     @Override
     public void buildID(String ID) throws ExcepcionUsuario{
-
-        // FALTA VALIDAR QUE NO EXISTA UN USUARIO CON EL ID RECIBIDO // 
         
         if(database.existeUsuario(ID)) {
             throw new ExcepcionUsuario("Este usuario ya existe");
@@ -65,7 +62,6 @@ public class UsuarioConcreteB implements UsuarioAbstractB{
     public Usuario getUser() {
         
         user.setBankAccounts(new ArrayList<>());
-        // FALTA AGREGAR USER A LA LISTA DE USUARIOS //
         return user;
         
     }

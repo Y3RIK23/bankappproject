@@ -9,19 +9,19 @@ import java.util.Date;
 
 public class Transacciones {
 
-    private final Datos data = Datos.getInstance();
+    private final Datos datos = Datos.getInstance();
 
-    public String deposit(TransaccionDTO dto) throws IllegalArgumentException {
+    public String depositar(TransaccionDTO dto) throws IllegalArgumentException {
         if (dto.amount <= 0) {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        Usuario user = data.buscarUsuarioPorId(dto.userId);
-        if (user == null) {
+        Usuario usuario = datos.buscarUsuarioPorId(dto.userId);
+        if (usuario == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
 
-        CuentaBancaria cuenta = buscarCuentaPorNumero(user, dto.accountNumber);
+        CuentaBancaria cuenta = buscarCuentaPorNumero(usuario, dto.accountNumber);
         if (cuenta == null) {
             throw new IllegalArgumentException("Cuenta no encontrada para el usuario");
         }
@@ -36,7 +36,7 @@ public class Transacciones {
         Transaccion transaccion = new Transaccion(new Date(), Transaccion.TransaccionType.DEPOSITO, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
 
-        data.guardarUsuario(user);
+        datos.guardarUsuario(usuario);
 
         return String.format("Depósito exitoso. Nuevo saldo: %.2f en la cuenta %s", nuevoSaldo, cuenta.getNumeroCuenta());
     }
@@ -46,7 +46,7 @@ public class Transacciones {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        Usuario user = data.buscarUsuarioPorId(dto.userId);
+        Usuario user = datos.buscarUsuarioPorId(dto.userId);
         if (user == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
@@ -70,7 +70,7 @@ public class Transacciones {
         Transaccion transaccion = new Transaccion(new Date(), Transaccion.TransaccionType.RETIRO, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
 
-        data.guardarUsuario(user);
+        datos.guardarUsuario(user);
 
         return String.format("Retiro exitoso. Nuevo saldo: %.2f en la cuenta %s", nuevoSaldo, cuenta.getNumeroCuenta());
     }
@@ -80,7 +80,7 @@ public class Transacciones {
             throw new IllegalArgumentException("El monto debe ser mayor a 0");
         }
 
-        Usuario user = data.buscarUsuarioPorId(dto.userId);
+        Usuario user = datos.buscarUsuarioPorId(dto.userId);
         if (user == null) {
             throw new IllegalArgumentException("Usuario no encontrado");
         }
@@ -107,7 +107,7 @@ public class Transacciones {
         Transaccion transaccion = new Transaccion(new Date(), Transaccion.TransaccionType.INVERSION, dto.amount);
         cuenta.getEstadoCuenta().add(transaccion);
 
-        data.guardarUsuario(user);
+        datos.guardarUsuario(user);
 
         return String.format("Certificado de Inversion exitoso. Nuevo saldo: %.2f en la cuenta %s", dto.amount, cuenta.getNumeroCuenta());
 

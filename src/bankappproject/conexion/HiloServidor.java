@@ -14,10 +14,13 @@ import bankappproject.funciones.autenticacion.InicioSesionDTO;
 import bankappproject.funciones.autenticacion.Autenticacion;
 import bankappproject.funciones.transaccion.Transacciones;
 import bankappproject.funciones.baseDatos.Datos;
+import bankappproject.funciones.transaccion.Transaccion;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class HiloServidor extends Thread {
 
@@ -110,22 +113,19 @@ public class HiloServidor extends Thread {
         boolean activo = true;
 
         while (activo) {
-            output.writeUTF("Menú:\n1 - Ver cuentas\n2 - Crear cuenta\n3 - Depositar\n4 - Retirar\n5 - Inversión\n6 - Estado de cuenta\n7 - Cerrar sesión");
+            // Mostrar todas las cuentas del usuario
+            StringBuilder cuentas = new StringBuilder("Cuentas:\n");
+            for (CuentaBancaria cuenta : usuario.getBankAccounts()) {
+                cuentas.append(cuenta.getNumeroCuenta())
+                        .append(" - Saldo: ").append(cuenta.getSaldoDisponible())
+                        .append("\n");
+            }
+            output.writeUTF(cuentas.toString() + "\nMenú:\n1 - Crear cuenta\n2 - Depositar\n3 - Retirar\n4 - Inversión\n5 - Estado de cuenta\n6 - Cerrar sesión");
             String opcion = input.readUTF();
 
             try {
                 switch (opcion) {
                     case "1":
-                        // Mostrar todas las cuentas del usuario
-                        StringBuilder cuentas = new StringBuilder("Cuentas:\n");
-                        for (CuentaBancaria cuenta : usuario.getBankAccounts()) {
-                            cuentas.append("Cuenta: ").append(cuenta.getNumeroCuenta())
-                                    .append(" - Saldo: ").append(cuenta.getSaldoDisponible()).append("\n");
-                        }
-                        output.writeUTF(cuentas.toString());
-                        break;
-
-                    case "2":
                         // Crear una nueva cuenta bancaria
                         CuentaBancaria nuevaCuenta = new CuentaBancaria();
 
@@ -140,7 +140,7 @@ public class HiloServidor extends Thread {
                         output.writeUTF("Cuenta creada con éxito: " + nuevaCuenta.getNumeroCuenta());
                         break;
 
-                    case "3":
+                    case "2":
                         // Proceso de depósito
                         output.writeUTF("Ingrese número de cuenta:");
                         String cuentaDeposito = input.readUTF();
@@ -153,10 +153,10 @@ public class HiloServidor extends Thread {
                         dtoDeposito.accountNumber = cuentaDeposito;
                         dtoDeposito.amount = monto;
 
-                        output.writeUTF(transactionsService.deposit(dtoDeposito));
+                        output.writeUTF(transactionsService.depositar(dtoDeposito));
                         break;
 
-                    case "4":
+                    case "3":
                         // Proceso de retiro
                         output.writeUTF("Ingrese número de cuenta:");
                         String cuentaRetiro = input.readUTF();
@@ -171,7 +171,7 @@ public class HiloServidor extends Thread {
                         output.writeUTF(transactionsService.withdraw(dtoRetiro));
                         break;
 
-                    case "5":
+                    case "4":
                         // Proceso de inversión
                         output.writeUTF("Ingrese número de cuenta:");
                         String cuentaInversion = input.readUTF();
@@ -186,14 +186,14 @@ public class HiloServidor extends Thread {
                         output.writeUTF(transactionsService.invertir(dtoInversion));
                         break;
 
-                    case "6":
+                    case "5":
                         // Consultar estado de cuenta
                         output.writeUTF("Ingrese número de cuenta:");
                         String numeroCuentaEstado = input.readUTF();
                         output.writeUTF(transactionsService.accountStatus(usuario.getId(), numeroCuentaEstado));
                         break;
 
-                    case "7":
+                    case "6":
                         // Cerrar sesión del usuario
                         authService.logout(usuario.getId());
                         output.writeUTF("Sesión cerrada correctamente.");
@@ -210,8 +210,69 @@ public class HiloServidor extends Thread {
         }
     }
 
+    
+    private void cargarDatosIniciales() {
+    Datos datos = Datos.getInstance();
+
+    // Prevenir doble carga si ya hay usuarios
+    if (!datos.listarUsuarios().isEmpty()) return;
+
+    // Preparar builder y director
+    UsuarioDirector director = new UsuarioDirector();
+
+    try {
+        // Usuario 1
+        UsuarioConcreteB builder1 = new UsuarioConcreteB();
+        Usuario u1 = director.construirAlerta(builder1, "123456789", "pass123");
+        u1.setAlreadyActive(false);
+
+        CuentaBancaria c1 = new CuentaBancaria();
+        CuentaBancaria c2 = new CuentaBancaria();
+        agregarTransacciones(c1);
+        agregarTransacciones(c2);
+        u1.setBankAccounts(new ArrayList<>(List.of(c1, c2)));
+
+        datos.guardarUsuario(u1);
+
+        // Usuario 2
+        UsuarioConcreteB builder2 = new UsuarioConcreteB();
+        Usuario u2 = director.construirAlerta(builder2, "987654321", "clave456");
+        u2.setAlreadyActive(false);
+
+        CuentaBancaria c3 = new CuentaBancaria();
+        agregarTransacciones(c3);
+        u2.setBankAccounts(new ArrayList<>(List.of(c3)));
+
+        datos.guardarUsuario(u2);
+
+        // Usuario 3
+        UsuarioConcreteB builder3 = new UsuarioConcreteB();
+        Usuario u3 = director.construirAlerta(builder3, "456123789", "abc789");
+        u3.setAlreadyActive(false);
+
+        CuentaBancaria c4 = new CuentaBancaria();
+        agregarTransacciones(c4);
+        u3.setBankAccounts(new ArrayList<>(List.of(c4)));
+
+        datos.guardarUsuario(u3);
+
+        System.out.println("Usuarios de prueba cargados correctamente.");
+
+    } catch (ExcepcionUsuario e) {
+        System.err.println("Error cargando usuarios de prueba: " + e.getMessage());
+    }
+}
+    
+    private void agregarTransacciones(CuentaBancaria cuenta) {
+    cuenta.addTransaccion(new Transaccion(new Date(), Transaccion.TransaccionType.DEPOSITO, 1000));
+    cuenta.addTransaccion(new Transaccion(new Date(), Transaccion.TransaccionType.RETIRO, 250));
+    cuenta.addTransaccion(new Transaccion(new Date(), Transaccion.TransaccionType.INVERSION, 150));
+    cuenta.addSaldoDisponible(600); 
+}
+
     public void run() {
         try {
+            cargarDatosIniciales();
             getStreams();
             procesarCliente();
         } catch (IOException ex) {

@@ -4,9 +4,18 @@
  */
 package bankappproject.conexion;
 
+import bankappproject.funciones.baseDatos.Datos;
+import bankappproject.funciones.transaccion.TransaccionDTO;
+import bankappproject.funciones.transaccion.Transacciones;
+import bankappproject.modelos.CuentaBancaria;
+import bankappproject.modelos.usuario.Usuario;
+import bankappproject.modelos.usuario.UsuarioConcreteB;
+import bankappproject.modelos.usuario.UsuarioDirector;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  *
@@ -30,6 +39,8 @@ public class Servidor {
             closeServer();
         }
     }
+
+    
 
     private Socket waitForConnection() throws IOException {
         System.out.println("Waiting for connection...\n");

@@ -22,6 +22,7 @@ public class Cliente {
     private final String HOST = "127.0.0.1";
     private final int PORT = 12345;
 
+
     public void runClient() {
         try {
             connectToServer();
@@ -77,7 +78,7 @@ public class Cliente {
                         // En menú: cerrar sesión o salir
                         // Se envía "3" o "7", que en servidor es Salir / Cerrar sesión
                         if (mensaje.contains("Menú:")) {
-                            output.writeUTF("7");
+                            output.writeUTF("6");
                         } else {
                             output.writeUTF("3");
                         }
