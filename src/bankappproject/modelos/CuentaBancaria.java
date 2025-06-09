@@ -74,7 +74,7 @@ public class CuentaBancaria {
 
                 sb.append(String.format(
                         "%-15s %-15s %-15s %15.2f %n",
-                        new SimpleDateFormat("dd/mm/yy").format(transaction.getFecha()),
+                        new SimpleDateFormat("dd/MM/yy").format(transaction.getFecha()),
                         transaction.getTransactionType(),
                         "",
                         transaction.getMonto()));
@@ -84,7 +84,7 @@ public class CuentaBancaria {
             } else {
                 sb.append(String.format(
                         "%-15s %-15s %15.2f %-15s %n",
-                        new SimpleDateFormat("dd/mm/yy").format(transaction.getFecha()),
+                        new SimpleDateFormat("dd/MM/yy").format(transaction.getFecha()),
                         transaction.getTransactionType(),
                         transaction.getMonto(),
                         ""));

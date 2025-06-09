@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.conexion;
+package bankappproject.server;
 
 import bankappproject.modelos.CuentaBancaria;
 import bankappproject.modelos.usuario.Usuario;
@@ -182,7 +182,8 @@ public class HiloServidor extends Thread {
                         dtoInversion.userId = usuario.getId();
                         dtoInversion.accountNumber = cuentaInversion;
                         dtoInversion.amount = montoInversion;
-
+                        
+                        System.out.println("Realizando inversion, espere...");
                         output.writeUTF(transactionsService.invertir(dtoInversion));
                         break;
 

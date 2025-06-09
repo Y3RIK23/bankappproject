@@ -2,20 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package bankappproject.conexion;
+package bankappproject.server;
 
-import bankappproject.funciones.baseDatos.Datos;
-import bankappproject.funciones.transaccion.TransaccionDTO;
-import bankappproject.funciones.transaccion.Transacciones;
-import bankappproject.modelos.CuentaBancaria;
-import bankappproject.modelos.usuario.Usuario;
-import bankappproject.modelos.usuario.UsuarioConcreteB;
-import bankappproject.modelos.usuario.UsuarioDirector;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
+
 
 /**
  *
